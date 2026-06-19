@@ -1,7 +1,11 @@
+"use client";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useState } from "react";
 
 export default function Generate() {
+  const [productName, setProductName] = useState("");
   return (
     <main className="min-h-screen flex flex-col">
       <Navbar />
@@ -17,6 +21,15 @@ export default function Generate() {
             Enter your product details below to generate a professional
             e-commerce listing optimised for Amazon.in and Flipkart.
           </p>
+
+          <input
+            type="text"
+            value={productName}
+            onChange={(e) => setProductName(e.target.value)}
+            placeholder="Enter product name..."
+            className="border border-gray-300 rounded px-3 py-2 w-full max-w-md mx-auto block mb-4 placeholder:text-gray-600 text-gray-800"
+          />
+          <p className="mt-2 text-gray-500">You typed: {productName}</p>
 
           <div className="p-6 bg-orange-50 rounded-xl border border-orange-100">
             <p className="text-orange-500 font-semibold text-lg">
