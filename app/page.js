@@ -113,12 +113,12 @@ export default function Home() {
       <Hero />
 
       {/* Products grid section */}
-      <section className="py-16 px-6 bg-gray-50 flex-grow">
+      <section className="py-16 px-6 bg-gray-50 dark:bg-gray-900 flex-grow transition-colors">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2 text-center">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2 text-center">
             HimShakti Products
           </h2>
-          <p className="text-gray-500 text-center mb-10">
+          <p className="text-gray-500 dark:text-gray-400 text-center mb-10">
             Generate AI-powered descriptions for these products
           </p>
 

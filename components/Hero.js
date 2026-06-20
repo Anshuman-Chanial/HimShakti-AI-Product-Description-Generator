@@ -3,10 +3,10 @@
 
 export default function Hero() {
   return (
-    <section className="bg-orange-50 py-20 px-6 text-center">
+    <section className="bg-orange-50 dark:bg-gray-900 py-20 px-6 text-center transition-colors">
       
       {/* Main headline */}
-      <h1 className="text-4xl font-bold text-gray-800 mb-4">
+      <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4">
         AI-Powered Product Descriptions{" "}
         <span className="text-orange-500">for Himalayan Foods</span>
       </h1>

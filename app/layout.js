@@ -1,4 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner"; // Import Toaster for global notifications
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,11 +20,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} suppressHydrationWarning>
+      <body className="min-h-full flex flex-col bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+          <Toaster />
+        </ThemeProvider>
+      </body>
     </html>
-  );
+  ); 
 }
