@@ -95,6 +95,30 @@ router.get("/history", async (req, res) => {
 });
 
 
+
+
+
+
+// PUT /api/history/:id — update a saved generation's tone
+router.put("/history/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+  const { tone } = req.body;
+
+  try {
+    const updated = await prisma.generationHistory.update({
+      where: { id },
+      data: { tone },
+    });
+    res.status(200).json(updated);
+  } catch (error) {
+    res.status(404).json({ error: "History entry not found" });
+  }
+});
+
+
+
+
+
 // 5. DELETE /api/history/:id — delete one saved generation
 // router.delete("/history/:id", (req, res) => {
 //   const id = parseInt(req.params.id);

@@ -47,6 +47,23 @@ product descriptions for HimShakti Food Processing Unit (Haldwani, Uttarakhand).
 | DELETE | /api/history/:id | Delete a history entry |
 | GET | /api/history/search?q= | Search history by product name |
 
+## Database
+
+**Database:** PostgreSQL via Supabase (free tier, Seoul region)  
+**ORM:** Prisma v6  
+
+### Schema
+Two tables:
+- `Product` — stores HimShakti product catalog (id, title, description)
+- `GenerationHistory` — stores all AI-generated descriptions (id, productName, generatedText, tone, createdAt)
+
+### Set up the database locally
+1. Create a free project at supabase.com
+2. Copy your connection string from Project Settings → Database
+3. Add to `backend/.env`: `DATABASE_URL="your_connection_string"`
+4. Run `cd backend && npx prisma migrate dev`
+5. Seed sample products: `node prisma/seed.js`
+
 ## Built By
 Anshuman Chanial | TBI-26100231  
 TBI-GEU Summer Internship Program 2026  
