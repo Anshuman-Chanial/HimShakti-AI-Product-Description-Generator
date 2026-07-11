@@ -6,6 +6,9 @@ const router = express.Router();
 // const { products, history, getNextHistoryId } = require("../data/store");
 const prisma = require("../lib/prisma");
 
+// Import the requireAuth middleware to protect certain routes
+const requireAuth = require("../middleware/auth");
+
 // 1. GET /api/products — list all products
 // router.get("/products", (req, res) => {
 //   res.status(200).json(products);
@@ -62,7 +65,7 @@ router.get("/products/:id", async (req, res) => {
 
 //   res.status(201).json(newEntry);
 // });
-router.post("/generate", async (req, res) => {
+router.post("/generate", requireAuth, async (req, res) => {
   const { productName, ingredients, weight, features, tone } = req.body;
 
   if (!productName) {
@@ -87,7 +90,7 @@ router.post("/generate", async (req, res) => {
 // router.get("/history", (req, res) => {
 //   res.status(200).json(history);
 // });
-router.get("/history", async (req, res) => {
+router.get("/history", requireAuth, async (req, res) => {
   const history = await prisma.generationHistory.findMany({
     orderBy: { createdAt: "desc" },
   });
@@ -100,7 +103,7 @@ router.get("/history", async (req, res) => {
 
 
 // PUT /api/history/:id — update a saved generation's tone
-router.put("/history/:id", async (req, res) => {
+router.put("/history/:id", requireAuth, async (req, res) => {
   const id = parseInt(req.params.id);
   const { tone } = req.body;
 
@@ -131,7 +134,7 @@ router.put("/history/:id", async (req, res) => {
 //   history.splice(index, 1);
 //   res.status(204).send();
 // });
-router.delete("/history/:id", async (req, res) => {
+router.delete("/history/:id", requireAuth, async (req, res) => {
   const id = parseInt(req.params.id);
 
   try {
@@ -152,7 +155,7 @@ router.delete("/history/:id", async (req, res) => {
 
 //   res.status(200).json(results);
 // });
-router.get("/history/search", async (req, res) => {
+router.get("/history/search", requireAuth, async (req, res) => {
   const query = req.query.q || "";
   const results = await prisma.generationHistory.findMany({
     where: {

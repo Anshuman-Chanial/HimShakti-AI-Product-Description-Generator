@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function Demo() {
   const [email, setEmail] = useState("");
@@ -28,6 +29,7 @@ export default function Demo() {
   };
 
   return (
+    <ProtectedRoute>
     <main className="min-h-screen flex flex-col">
       <Navbar />
 
@@ -115,5 +117,6 @@ export default function Demo() {
 
       <Footer />
     </main>
+    </ProtectedRoute>
   );
 }

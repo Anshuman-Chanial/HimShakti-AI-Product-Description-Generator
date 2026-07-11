@@ -58,6 +58,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function Generate() {
   // One useState per form field — same pattern you already know
@@ -83,9 +84,14 @@ export default function Generate() {
     setResult(null);      // clear any previous result
 
     try {
+      const token = localStorage.getItem("token");
+
       const response = await fetch("http://localhost:5000/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({ productName, ingredients, weight, features, tone }),
       });
 
@@ -107,6 +113,7 @@ export default function Generate() {
   };
 
   return (
+    <ProtectedRoute>
     <main className="min-h-screen flex flex-col">
       <Navbar />
 
@@ -173,5 +180,7 @@ export default function Generate() {
 
       <Footer />
     </main>
+    </ProtectedRoute>
   );
 }
+
