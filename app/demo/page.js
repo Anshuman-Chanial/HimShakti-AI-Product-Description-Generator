@@ -35,7 +35,7 @@ export default function Demo() {
 
       <section className="flex-grow py-16 px-6 max-w-3xl mx-auto w-full space-y-12">
 
-        <h1 className="text-3xl font-bold text-gray-800">Component Library Showcase</h1>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Component Library Showcase</h1>
 
         {/* BUTTON */}
         <div>
@@ -52,7 +52,7 @@ export default function Demo() {
         {/* INPUT */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Input</h2>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Email Address
           </label>
           <Input
