@@ -9,6 +9,9 @@ const prisma = require("../lib/prisma");
 // Import the requireAuth middleware to protect certain routes
 const requireAuth = require("../middleware/auth");
 
+// Import the Gemini service for generating product descriptions
+const generateProductDescription = require("../services/gemini");
+
 // 1. GET /api/products — list all products
 // router.get("/products", (req, res) => {
 //   res.status(200).json(products);
@@ -65,6 +68,25 @@ router.get("/products/:id", async (req, res) => {
 
 //   res.status(201).json(newEntry);
 // });
+// router.post("/generate", requireAuth, async (req, res) => {
+//   const { productName, ingredients, weight, features, tone } = req.body;
+
+//   if (!productName) {
+//     return res.status(400).json({ error: "productName is required" });
+//   }
+
+//   const generatedText = `${productName} — crafted with ${ingredients || "premium natural ingredients"}, ${weight || ""}. ${features || ""} A ${tone || "premium"} choice for conscious buyers.`;
+
+//   const newEntry = await prisma.generationHistory.create({
+//     data: {
+//       productName,
+//       generatedText,
+//       tone: tone || "premium",
+//     },
+//   });
+
+//   res.status(201).json(newEntry);
+// });
 router.post("/generate", requireAuth, async (req, res) => {
   const { productName, ingredients, weight, features, tone } = req.body;
 
@@ -72,18 +94,32 @@ router.post("/generate", requireAuth, async (req, res) => {
     return res.status(400).json({ error: "productName is required" });
   }
 
-  const generatedText = `${productName} — crafted with ${ingredients || "premium natural ingredients"}, ${weight || ""}. ${features || ""} A ${tone || "premium"} choice for conscious buyers.`;
+  try {
+    // Call Gemini instead of building a fake template string
+    const generatedText = await generateProductDescription({
+      productName, ingredients, weight, features, tone,
+    });
 
-  const newEntry = await prisma.generationHistory.create({
-    data: {
-      productName,
-      generatedText,
-      tone: tone || "premium",
-    },
-  });
+    const newEntry = await prisma.generationHistory.create({
+      data: {
+        productName,
+        generatedText,
+        tone: tone || "premium",
+      },
+    });
 
-  res.status(201).json(newEntry);
+    res.status(201).json(newEntry);
+  } catch (error) {
+    console.error("Gemini API error:", error);
+    res.status(500).json({ error: "Failed to generate description. Please try again." });
+  }
 });
+
+
+
+
+
+
 
 
 // 4. GET /api/history — list all past generations
