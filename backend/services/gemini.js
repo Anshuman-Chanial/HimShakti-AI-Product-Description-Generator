@@ -1,11 +1,26 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
 
 // Initialize once, using your API key from .env
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 async function generateProductDescription({ productName, ingredients, weight, features, tone }) {
   // "gemini-2.5-flash" = fast + free-tier friendly, good enough for this task
-  const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+  const model = genAI.getGenerativeModel({ model: "gemini-flash-latest",
+
+  // Tell Gemini's own safety system what to filter, using its trained classifiers
+    safetySettings: [
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+    ]
+  });
+
+
 
   // This is the PROMPT — the exact instructions the model sees.
   // Notice: role + task + specifics + constraints, like we just discussed.
@@ -60,6 +75,12 @@ Rules:
 
   // This line actually sends the prompt to Google's servers and waits for a reply
   const result = await model.generateContent(prompt);
+
+  // If Gemini's safety system blocks the response, result.response.text() throws
+  // or the response comes back empty — worth checking explicitly
+  if (!result.response.candidates || result.response.candidates.length === 0) {
+    throw new Error("Content blocked by safety filters");
+  }
 
   // The response comes back wrapped in an object — .response.text() extracts the plain string
   const text = result.response.text();

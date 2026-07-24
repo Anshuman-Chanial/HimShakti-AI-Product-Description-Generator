@@ -87,11 +87,22 @@ router.get("/products/:id", async (req, res) => {
 
 //   res.status(201).json(newEntry);
 // });
+
+const BLOCKED_TERMS = ["radioactive", "explosive", "weapon", "toxic", "poison", "narcotic"];
+
 router.post("/generate", requireAuth, async (req, res) => {
   const { productName, ingredients, weight, features, tone } = req.body;
 
   if (!productName) {
     return res.status(400).json({ error: "productName is required" });
+  }
+
+  // Basic content check across all text fields before sending to the AI
+  const combinedText = `${productName} ${ingredients} ${features}`.toLowerCase();
+  const hasBlockedTerm = BLOCKED_TERMS.some((term) => combinedText.includes(term));
+
+  if (hasBlockedTerm) {
+    return res.status(400).json({ error: "Product details contain terms not permitted for description generation." });
   }
 
   try {
