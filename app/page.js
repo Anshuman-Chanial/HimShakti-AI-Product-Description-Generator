@@ -72,47 +72,139 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 // page.js — This is your HOME page (localhost:3000)
 // It imports and combines all 4 components
 
+// import Navbar from "@/components/Navbar";
+// import Hero from "@/components/Hero";
+// import Card from "@/components/Card";
+// import Footer from "@/components/Footer";
+
+// // Sample HimShakti products — the Card component will display these
+// const products = [
+//   {
+//     title: "Himalayan Millet Snack",
+//     description: "Crispy, nutritious snacks made from high-altitude millets grown in Uttarakhand. Rich in protein and fiber.",
+//     actionText: "Generate Description",
+//     actionLink: "/generate",
+//   },
+//   {
+//     title: "Traditional Fruit Pickle",
+//     description: "Artisanal fruit pickles made from locally sourced Himalayan produce using age-old family recipes.",
+//     actionText: "Generate Description",
+//     actionLink: "/generate",
+//   },
+//   {
+//     title: "Mountain Berry Juice",
+//     description: "Cold-pressed juices from wild Himalayan berries, packed with antioxidants and natural goodness.",
+//     actionText: "Generate Description",
+//     actionLink: "/generate",
+//   },
+// ];
+
+// export default function Home() {
+//   return (
+//     <main className="min-h-screen flex flex-col">
+      
+//       {/* Top navigation */}
+//       <Navbar />
+
+//       {/* Hero banner */}
+//       <Hero />
+
+//       {/* Products grid section */}
+//       <section className="py-16 px-6 bg-gray-50 dark:bg-gray-900 flex-grow transition-colors">
+//         <div className="max-w-6xl mx-auto">
+//           <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2 text-center">
+//             HimShakti Products
+//           </h2>
+//           <p className="text-gray-500 dark:text-gray-400 text-center mb-10">
+//             Generate AI-powered descriptions for these products
+//           </p>
+
+//           {/* 3 cards in a grid — Card component used 3 times */}
+//           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+//             {products.map((product, index) => (
+//               <Card key={index} {...product} />
+//             ))}
+//           </div>
+//         </div>
+//       </section>
+
+//       {/* Footer */}
+//       <Footer />
+
+//     </main>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"use client";
+
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Card from "@/components/Card";
 import Footer from "@/components/Footer";
-
-// Sample HimShakti products — the Card component will display these
-const products = [
-  {
-    title: "Himalayan Millet Snack",
-    description: "Crispy, nutritious snacks made from high-altitude millets grown in Uttarakhand. Rich in protein and fiber.",
-    actionText: "Generate Description",
-    actionLink: "/generate",
-  },
-  {
-    title: "Traditional Fruit Pickle",
-    description: "Artisanal fruit pickles made from locally sourced Himalayan produce using age-old family recipes.",
-    actionText: "Generate Description",
-    actionLink: "/generate",
-  },
-  {
-    title: "Mountain Berry Juice",
-    description: "Cold-pressed juices from wild Himalayan berries, packed with antioxidants and natural goodness.",
-    actionText: "Generate Description",
-    actionLink: "/generate",
-  },
-];
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 export default function Home() {
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/products");
+        if (!response.ok) throw new Error("Failed to load products");
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        toast.error("Could not load products.");
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <main className="min-h-screen flex flex-col">
-      
-      {/* Top navigation */}
       <Navbar />
-
-      {/* Hero banner */}
       <Hero />
 
-      {/* Products grid section */}
       <section className="py-16 px-6 bg-gray-50 dark:bg-gray-900 flex-grow transition-colors">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2 text-center">
@@ -122,18 +214,31 @@ export default function Home() {
             Generate AI-powered descriptions for these products
           </p>
 
-          {/* 3 cards in a grid — Card component used 3 times */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {products.map((product, index) => (
-              <Card key={index} {...product} />
-            ))}
-          </div>
+          {isLoading && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Skeleton className="h-48 w-full" />
+              <Skeleton className="h-48 w-full" />
+              <Skeleton className="h-48 w-full" />
+            </div>
+          )}
+
+          {!isLoading && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {products.map((product) => (
+                <Card
+                  key={product.id}
+                  title={product.title}
+                  description={product.description}
+                  actionText="Generate Description"
+                  actionLink="/generate"
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Footer */}
       <Footer />
-
     </main>
   );
 }
