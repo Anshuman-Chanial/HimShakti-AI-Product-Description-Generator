@@ -25,6 +25,8 @@ model GenerationHistory {
   generatedText String
   tone          String
   createdAt     DateTime @default(now())
+  userId        Int?
+  user          User?    @relation(fields: [userId], references: [id])
 }
 
 
@@ -34,4 +36,5 @@ model User {
   email     String   @unique
   password  String   // this will store the bcrypt HASH, never plain text
   createdAt DateTime @default(now())
+  history   GenerationHistory[]
 }

@@ -116,6 +116,7 @@ router.post("/generate", requireAuth, async (req, res) => {
         productName,
         generatedText,
         tone: tone || "premium",
+        userId: req.user.userId, // ← comes from the JWT payload, set by requireAuth
       },
     });
 
@@ -139,6 +140,7 @@ router.post("/generate", requireAuth, async (req, res) => {
 // });
 router.get("/history", requireAuth, async (req, res) => {
   const history = await prisma.generationHistory.findMany({
+    where: { userId: req.user.userId },
     orderBy: { createdAt: "desc" },
   });
   res.status(200).json(history);
@@ -155,10 +157,16 @@ router.put("/history/:id", requireAuth, async (req, res) => {
   const { tone } = req.body;
 
   try {
-    const updated = await prisma.generationHistory.update({
-      where: { id },
+    const result = await prisma.generationHistory.updateMany({
+      where: { id, userId: req.user.userId },
       data: { tone },
     });
+
+    if (result.count === 0) {
+      return res.status(404).json({ error: "History entry not found" });
+    }
+
+    const updated = await prisma.generationHistory.findUnique({ where: { id } });
     res.status(200).json(updated);
   } catch (error) {
     res.status(404).json({ error: "History entry not found" });
@@ -185,7 +193,14 @@ router.delete("/history/:id", requireAuth, async (req, res) => {
   const id = parseInt(req.params.id);
 
   try {
-    await prisma.generationHistory.delete({ where: { id } });
+    const result = await prisma.generationHistory.deleteMany({
+      where: { id, userId: req.user.userId },
+    });
+
+    if (result.count === 0) {
+      return res.status(404).json({ error: "History entry not found" });
+    }
+
     res.status(204).send();
   } catch (error) {
     res.status(404).json({ error: "History entry not found" });
@@ -206,10 +221,8 @@ router.get("/history/search", requireAuth, async (req, res) => {
   const query = req.query.q || "";
   const results = await prisma.generationHistory.findMany({
     where: {
-      productName: {
-        contains: query,
-        mode: "insensitive",
-      },
+      userId: req.user.userId,
+      productName: { contains: query, mode: "insensitive" },
     },
   });
 
