@@ -59,6 +59,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { authFetch } from "@/lib/api";
 
 export default function Generate() {
   // One useState per form field — same pattern you already know
@@ -84,19 +85,17 @@ export default function Generate() {
     setResult(null);      // clear any previous result
 
     try {
-      const token = localStorage.getItem("token");
+      // const token = localStorage.getItem("token");
 
-      const response = await fetch("http://localhost:5000/api/generate", {
+      const response = await authFetch("http://localhost:5000/api/generate", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productName, ingredients, weight, features, tone }),
       });
 
       if (!response.ok) {
-        throw new Error("Backend returned an error");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Backend returned an error");
       }
 
       const data = await response.json();
@@ -104,8 +103,13 @@ export default function Generate() {
       toast.success("Description generated!");
 
     } catch (error) {
-      toast.error("Could not connect to backend. Is the server running?");
-      console.error(error);
+      if (error.isSessionExpired) {
+        toast.error("Your session has expired. Please log in again.");
+        window.location.href = "/login";
+        return;
+      }
+      toast.error(error.message || "Could not connect to backend. Is the server running?");
+      console.error(error);        
 
     } finally {
       setIsLoading(false);  // hide the skeleton, whether it succeeded or failed
@@ -152,6 +156,7 @@ export default function Generate() {
             <Button onClick={handleGenerate} disabled={isLoading} className="w-full">
               {isLoading ? "Generating..." : "Generate Description"}
             </Button>
+            
           </div>
 
           {/* Skeleton shows ONLY while isLoading is true */}
