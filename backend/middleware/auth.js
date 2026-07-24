@@ -21,6 +21,7 @@ function requireAuth(req, res, next) {
     next(); // token is valid — let the request continue to the actual route
   } catch (err) {
     // jwt.verify throws if signature is invalid OR token expired
+    console.error("JWT verify failed:", err.message);
     return res.status(401).json({ error: "Invalid or expired token" });
   }
 }
